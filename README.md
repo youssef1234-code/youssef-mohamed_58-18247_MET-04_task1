@@ -1,9 +1,9 @@
-<!-- Part C — Explain what you did
-In your repository's README.md , write one paragraph (about 150–250 words) explaining your
-cleaning. It must cover:
-each problem you found, and how you fixed it;
-how many rows you started with, how many each duplicate step removed, and how many are left;
-why you kept the latest submission, and not the first;
-the order of your steps. Would you find the same duplicates if you removed them before fixing
-the club  spellings? Say what happens, with numbers;
-two different students have the same name. How did your cleaning avoid merging them? -->
+# Task 1 — Inconsistencies and duplicates
+
+**Name:** Youssef Mohamed  
+**ID:** 58-18247  
+**Lab:** MET-04
+
+## Part C — What I did
+
+The raw file has 39 rows. `faculty`, `club` and `city` each had several spellings (13, 13 and 9), so I stripped and lower-cased them, mapped what was left with an explicit dictionary (`Soccer` → `Football`, `Pharma` → `Pharmacy`) and asserted that only canonical values remain. Names had extra spaces and mixed case, so I collapsed the whitespace and title-cased them; emails are trimmed and lower-cased. The nine spellings of `fee_paid` became one boolean column. `signed_up_at` mixed `YYYY-MM-DD` (25 rows) with `DD/MM/YYYY` (14 rows): in every slash date the first number is above 12, so it is the day, and both parse into one datetime column. Only then did I remove duplicates: 3 exact copies (39 → 36), then 4 re-submissions of the same `student_id` + `club` (36 → 32). For those I sorted by `signed_up_at` and kept the last row, since the file is not in time order. I kept the latest because a re-submission is a correction: in all four pairs the first row is unpaid and the latest is paid, so keeping the first would list four paying members as unpaid. Order matters: deduplicating before fixing `club` finds the 3 exact copies but only 2 of the 4 re-submissions, because `Music`/`music` and `debate club`/`Debate` look like different clubs, leaving 34 rows instead of 32 while the uniqueness assertion still passes. Two students are called Mohamed Adel and share an email, but their `student_id`s differ (61-4844, 55-2992); I deduplicated on `student_id`, never the name, so they stay separate.
